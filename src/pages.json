@@ -1,0 +1,123 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationStyle": "custom",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/privacy/index",
+      "style": {
+        "navigationBarTitleText": "隐私政策",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/agreement/index",
+      "style": {
+        "navigationBarTitleText": "用户协议",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/interview-config/index",
+      "style": { "navigationBarTitleText": "面试配置" }
+    },
+    {
+      "path": "pages/interview/index",
+      "style": {
+        "navigationBarTitleText": "面试中",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/report/index",
+      "style": { "navigationBarTitleText": "面试报告" }
+    },
+    {
+      "path": "pages/history/index",
+      "style": {
+        "navigationStyle": "custom",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/history-detail/index",
+      "style": {
+        "navigationBarTitleText": "面试详情",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/stats/index",
+      "style": {
+        "navigationStyle": "custom",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/positions/index",
+      "style": { "navigationBarTitleText": "选择岗位" }
+    },
+    {
+      "path": "pages/profile/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/profile-edit/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/settings/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/help/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/about/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/quick-practice/index",
+      "style": { "navigationBarTitleText": "快速练习" }
+    },
+    {
+      "path": "pages/custom-questions/index",
+      "style": { "navigationBarTitleText": "自定义题目" }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "我的面试小屋",
+    "navigationBarBackgroundColor": "#F9F6F1",
+    "backgroundColor": "#F9F6F1",
+    "backgroundColorTop": "#F9F6F1",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#8C8C8C",
+    "selectedColor": "#1A1A1A",
+    "backgroundColor": "#F9F6F1",
+    "borderStyle": "black",
+    "list": [
+      { "pagePath": "pages/index/index", "text": "首页", "iconPath": "static/tabbar/home.png", "selectedIconPath": "static/tabbar/home_on.png" },
+      { "pagePath": "pages/history/index", "text": "历史", "iconPath": "static/tabbar/history.png", "selectedIconPath": "static/tabbar/history_on.png" },
+      { "pagePath": "pages/stats/index", "text": "统计", "iconPath": "static/tabbar/stats.png", "selectedIconPath": "static/tabbar/stats_on.png" },
+      { "pagePath": "pages/profile/index", "text": "我的", "iconPath": "static/tabbar/profile.png", "selectedIconPath": "static/tabbar/profile_on.png" }
+    ]
+  }
+}

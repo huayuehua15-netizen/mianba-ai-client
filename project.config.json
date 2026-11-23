@@ -1,0 +1,17 @@
+{
+  "miniprogramRoot": "dist/build/mp-weixin/",
+  "compileType": "miniprogram",
+  "appid": "",
+  "setting": {
+    "es6": true,
+    "postcss": true,
+    "minified": true,
+    "urlCheck": true,
+    "enhance": true,
+    "minifyWXML": true
+  },
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  }
+}
