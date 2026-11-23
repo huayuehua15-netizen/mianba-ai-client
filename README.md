@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/social-preview.png" alt="我的面试小屋 · v35 纸本朱砂" width="100%" />
+</p>
+
 <div align="center">
 
 # 我的面试小屋
@@ -22,6 +26,26 @@
 </div>
 
 > 本仓库只包含前端代码，后端服务未包含在内。运行完整流程需要自行准备兼容的接口服务。
+
+<p align="center">
+  <a href="https://huayuehua15-netizen.github.io/mianba-ai-client/"><b>项目主页</b></a>
+  &nbsp;·&nbsp;
+  <a href="docs/ARCHITECTURE.md">架构说明</a>
+  &nbsp;·&nbsp;
+  <a href="#快速开始">快速开始</a>
+</p>
+
+## 项目速览
+
+| 指标 | 数值 |
+| --- | ---: |
+| 页面 | 17 |
+| 通用组件 | 15 |
+| 源码行数 | 25,026 |
+| 单元测试 | 15 |
+| 构建产物 | 0.77 MB / 169 files |
+| 图表库 | 0 |
+| `<u-*>` 组件标签 | 0 |
 
 ## 界面预览 · v35 纸本朱砂
 
@@ -285,7 +309,7 @@ CI 见 [.github/workflows/ci.yml](.github/workflows/ci.yml)：Node 20 上安装�
 
 ## 已知约束与设计取舍
 
-- **主包 2MB**：17 个页面全部在主包，无分包。图表、图标因此都选择零运行时依赖的方案。
+- **主包 2MB 限制**：17 个页面全部在主包，无分包；当前构建产物 **0.77 MB / 169 files**。图表、图标因此都选择零运行时依赖的方案。
 - **不使用 Skyline**：现有布局与 SVG 图表依赖 WebView 渲染模型，迁移需要整体返工，属于明确的设计决策。
 - **不引入第三方 UI 库**：`uview-plus` 只用于主题变量，全站 0 个 `<u-*>` 组件标签。
 - **后端未开源**：本仓库聚焦前端。接口统一返回 `{ code, message, data }`，AI 回答走 SSE。
