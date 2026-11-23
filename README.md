@@ -23,22 +23,27 @@
 
 > 本仓库只包含前端代码，后端服务未包含在内。运行完整流程需要自行准备兼容的接口服务。
 
-## 界面预览
+## 界面预览 · v35 纸本朱砂
 
 <p align="center">
-  <img src="docs/screenshots/index.png" width="200" alt="首页" />
+  <img src="docs/screenshots/index.png" width="180" alt="首页" />
   &nbsp;
-  <img src="docs/screenshots/interview-config.png" width="200" alt="面试配置" />
+  <img src="docs/screenshots/interview-config.png" width="180" alt="面试配置" />
   &nbsp;
-  <img src="docs/screenshots/positions.png" width="200" alt="岗位库" />
+  <img src="docs/screenshots/positions.png" width="180" alt="岗位库" />
+  &nbsp;
+  <img src="docs/screenshots/interview.png" width="180" alt="面试进行" />
 </p>
 <p align="center">
-  <img src="docs/screenshots/stats.png" width="200" alt="数据统计" />
+  <img src="docs/screenshots/report.png" width="180" alt="评分报告" />
   &nbsp;
-  <img src="docs/screenshots/history.png" width="200" alt="面试记录" />
+  <img src="docs/screenshots/stats.png" width="180" alt="数据统计" />
   &nbsp;
-  <img src="docs/screenshots/profile.png" width="200" alt="个人中心" />
+  <img src="docs/screenshots/history.png" width="180" alt="面试记录" />
+  &nbsp;
+  <img src="docs/screenshots/profile.png" width="180" alt="我的" />
 </p>
+<p align="center"><sub>截图来自微信开发者工具，昵称与数据均为脱敏测试数据。</sub></p>
 
 ## 这不是一个表单套壳
 
