@@ -32,3 +32,8 @@ jobs:
         env:
           VITE_API_BASE_URL: https://example.com/api/v1
         run: npm run build:mp-weixin
+
+      - name: Build H5
+        env:
+          VITE_API_BASE_URL: https://example.com/api/v1
+        run: npm run build:h5
