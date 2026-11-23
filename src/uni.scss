@@ -1,0 +1,499 @@
+/**
+ * 我的面试小屋 设计系统 v35 —— 纸本朱砂 · 压印版（Paper & Vermilion / Letterpress）
+ * ============================================================================
+ * 【v35 改版说明】
+ * v34「纸本朱砂」的立意是对的（面试=评估=一份被批注过的记录纸），但**执行太克制**：
+ * 全站实际只有两个颜色（米白 + 暖墨），朱砂出现率极低，阴影近乎为零，
+ * 字号梯度靠字重硬拉 —— 结果是一屏「很干净但很平」的界面，缺乏视觉记忆点。
+ *
+ * v35 保留立意，补上三件缺的东西：
+ *   ① **等级色阶**（grade scale）—— 面试产品天然产出 S/A/B/C/D，这套色阶是
+ *      语义色而不是装饰色：它让「你考了几分」在整屏上有颜色，而不再只有黑白。
+ *   ② **压印层次**（letterpress depth）—— "纸"是有厚度的。凹槽、压痕、裁切线、
+ *      叠纸投影，都是纸的物理属性，用它们建立层次比用阴影堆砌高级得多。
+ *   ③ **字号戏剧性**（display contrast）—— 巨号读数 vs 微型等宽标签，中间档位减少。
+ *      印刷品的张力来自比例差，不来自字号数量的多。
+ *
+ * ── 六条铁律（v35 收紧，违反任何一条质感立刻掉一档）───────────────────────
+ *  1. 底色只有一个：$paper。卡片 $paper-card，凹槽 $paper-sunken。不引入第三种底色。
+ *  2. 层次三招，优先级从高到低：**压印**（inset 阴影 + 深一档底色）→ 发丝线 → 底色差。
+ *     浮层/墨面才允许 drop shadow。**普通卡片永不投影**（v34 的铁律，v35 保留）。
+ *  3. 数字一律等宽 + tabular-nums。分数/轮次/时长/日期都是仪器读数。这是最硬的规则。
+ *  4. 圆角收敛：卡片 24rpx，面板 28rpx，按钮 16rpx，徽章 4rpx。
+ *     v35 比 v34 再收 4rpx —— 圆角越小越"硬"，越像印刷品而不是 App。
+ *     仅 chip/头像/开关保留 999rpx。
+ *  5. 字号靠**比例差**拉开，不靠字重狂飙：巨字($font-6xl) 与 微型($font-xs) 必须同屏出现。
+ *  6. 动效 0.16-0.28s 缓出；按压改 opacity + transform，时长一致。
+ *     v35 新增：按压时**墨面下沉 1rpx**（模拟按压纸张），不是缩放。
+ * ============================================================================
+ */
+
+/* ===== uView Plus 主题变量（必须在 @import 之前定义） ===== */
+$u-main-color: #17130E;
+$u-content-color: #4A443C;
+$u-tips-color: #877D71;
+$u-light-color: #C2B8AC;
+$u-border-color: #E4DCD0;
+$u-bg-color: #F9F6F1;
+$u-disabled-color: #C2B8AC;
+
+$u-primary: #17130E;
+$u-primary-dark: #000000;
+$u-primary-disabled: #D5CCBE;
+$u-primary-light: #F2EEE7;
+
+$u-warning: #96701F;
+$u-warning-dark: #7D5A14;
+$u-warning-disabled: #E0D2BA;
+$u-warning-light: #FBF3E6;
+
+$u-success: #2C7A58;
+$u-success-dark: #226047;
+$u-success-disabled: #BFD5CA;
+$u-success-light: #EEF6F1;
+
+$u-error: #C0392B;
+$u-error-dark: #96291D;
+$u-error-disabled: #E9C8C2;
+$u-error-light: #FBEDE9;
+
+$u-info: #877D71;
+$u-info-dark: #6B635A;
+$u-info-disabled: #D5CCBE;
+$u-info-light: #F2EEE7;
+
+@import 'uview-plus/theme.scss';
+
+/* ============================================================================
+ * 一、字体
+ * ============================================================================
+ * 衬线体在小程序端**不可用**（Android 无 Songti，回退 SimSun 后字重加不粗、
+ * 笔画发脏）—— 已在实践中确认，不再尝试。
+ * "纸本感"靠**米白底 + 压印 + 等宽数字**建立，不靠衬线。
+ */
+$font-sans: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'HarmonyOS Sans SC',
+  'Source Han Sans SC', 'Noto Sans SC', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+
+/* 等宽：全站数字（分数/轮次/时长/日期/序号）专用。
+   ASCII 数字在所有平台的等宽字体里都有，中文字符不会走这里。 */
+$font-mono: 'SF Mono', 'Menlo', 'Consolas', 'Roboto Mono', 'Courier New', monospace;
+
+$font-display: $font-sans;
+$font-serif: $font-display;   // 【兼容别名】不用衬线体，勿改回 Songti
+$font-rounded: $font-sans;
+
+/* ============================================================================
+ * 二、纸本调色板
+ * ============================================================================ */
+
+/* ----- 纸面 ----- */
+$paper: #F9F6F1;              // 页面底（米白，★ 不是纯白；v35 比 v34 暖 2‰）
+$paper-card: #FFFFFF;         // 卡片底（纯白：比纸面"更亮"= 浮起）
+$paper-sunken: #F1ECE3;       // 凹槽 / 次级填充（比纸面"更暗"= 内凹）
+$paper-raise: #FFFDFA;        // 极轻微抬升（用于叠在卡片上的次级块）
+$paper-warm: #F5EFE4;         // 偏暖的次级面（用于"票据/存根"语义的块）
+
+/* 兼容别名：旧的"背景"语义全部指向纸色 */
+$bg-page: $paper;
+$bg-space: $paper;
+$bg-space-2: $paper-sunken;
+$bg-card: $paper-card;
+$bg-card-solid: $paper-card;
+$bg-muted: $paper-sunken;
+$bg-fill: $paper-sunken;
+$bg-fill-strong: #E7E0D4;
+$bg-dark: $paper-sunken;
+$input-bg: $paper-sunken;
+$surface-glass: $paper-card;
+$surface-glass-2: $paper-sunken;
+
+/* ----- 墨色 ----- */
+$ink: #17130E;                // 主文字 / 标题 / 墨面板
+$ink-soft: #4A443C;           // 次文字
+$mauve: #877D71;              // 辅助文字
+$ash: #C2B8AC;                // 占位 / 禁用
+$hint: #E4DCD0;               // 极浅描边
+
+$text-primary: $ink;
+$text-secondary: $ink-soft;
+$text-tertiary: $mauve;
+$text-placeholder: $ash;
+$text-1: $ink;
+$text-2: $ink-soft;
+$text-3: $mauve;
+$text-4: $ash;
+$text-on-accent: #FFFFFF;
+$text-on-gold: #FFFFFF;
+$text-muted: #6B635A;         // 卡片内补充说明（介于 $ink-soft 与 $mauve 之间）
+
+/* ----- 朱砂（语义强调色，非装饰）----- */
+$verm: #C0392B;               // 印章红：段落序号 / 等级印章 / 当前状态 / 短板
+$verm-deep: #96291D;          // 朱砂深：渐变暗端 / 描边
+$verm-soft: #FBEDE9;          // 朱砂极浅：标签底
+$verm-line: rgba(192, 57, 43, 0.30);   // 朱砂描边（标签边框）
+
+/* ============================================================================
+ * 三、等级色阶（v35 新增 —— 本设计系统的第二个颜色轴）
+ * ============================================================================
+ * 面试产出评分与等级，这是产品的核心语义。v34 只用黑/灰画等级徽章，
+ * 导致「91 分 S 级」和「64 分 C 级」在界面上几乎看不出差别 —— 这是设计失职。
+ *
+ * v35 给五个等级各自一个**低饱和、印刷感**的颜色（不是明信片式的糖果色）：
+ *   S 鎏金 —— 最高荣誉，像烫金压印
+ *   A 朱砂 —— 优秀，与主强调色同源
+ *   B 墨青 —— 良好，沉稳
+ *   C 赭石 —— 及格，偏中性
+ *   D 石灰 —— 待提升，最弱
+ * 五个色都从"传统印刷油墨"里取，因此放在纸面上不打架。
+ * ⚠️ 用法：只用于等级徽章 / 分数读数 / 进度条填充 / 雷达多边形。
+ *    **不得**大面积铺色作背景 —— 一多就变成廉价彩色卡。
+ */
+$grade-s: #A8842C;            // 鎏金
+$grade-s-soft: #F7F0DC;
+$grade-a: $verm;              // 朱砂
+$grade-a-soft: $verm-soft;
+$grade-b: #2C5F52;            // 墨青
+$grade-b-soft: #EAF2EF;
+$grade-c: #96603A;            // 赭石
+$grade-c-soft: #F7EEE6;
+$grade-d: #7E7468;            // 石灰
+$grade-d-soft: #F0ECE5;
+
+/* ----- 等级色 · 墨面提亮版（v35.1 第十五批提升为全局令牌） -----
+ * 一级 $grade-* 是为**纸面**调的（描边/浅底），直接压在墨面板上对比度只有
+ * 3:1 左右（朱砂 #C0392B 尤甚），印章与刻度会糊进背景 —— 「5.9 分 D 级」
+ * 的首页就是因此看起来灰上加灰。
+ * 这组提亮值只用于**深色卡片内部**（首页 hero / 报告页总分卡）；
+ * 纸面上的色一律用上面的一级令牌。JS 侧对应 utils/grades.js 的 GRADE_INK_LIT。 */
+$grade-s-lit: #D9B45A;        // 鎏金提亮
+$grade-a-lit: #E8664F;        // 朱砂提亮
+$grade-b-lit: #5FAA8E;        // 墨青提亮
+$grade-c-lit: #C4895D;        // 赭石提亮
+$grade-d-lit: #A1968A;        // 石灰提亮（D 级也要在黑卡上看得见）
+
+/* ----- 描边（层次的主要手段）----- */
+$rule: #E4DCD0;               // 标准发丝线（★ 全站 hairlines 都用它）
+$rule-strong: #D2C8B8;        // 加重发丝线（分割大区块 / 输入框）
+$rule-ink: rgba(255, 255, 255, 0.13);  // 深色底上的发丝线
+
+/* 兼容别名 */
+$border-glass: $rule;
+$border-strong: $rule-strong;
+$border-glass-strong: $rule-strong;
+$border-ink: $ink;
+$track: $paper-sunken;
+
+/* ============================================================================
+ * 四、阴影与压印（v35 重做 —— 这是"纸有厚度"的来源）
+ * ============================================================================
+ * v34 几乎禁用阴影，导致所有元素贴在同一个平面上。
+ * v35 区分三类：
+ *   ① 压印 inset —— 凹槽、输入框、轨道。**向内的**阴影 = 纸被压下去。
+ *   ② 叠纸 drop —— 仅浮层（抽屉/弹窗/浮标）与墨面板。**向外的**阴影 = 纸叠起来。
+ *   ③ 平面 —— 普通卡片**没有阴影**，靠发丝线 + 底色差。
+ * ⚠️ 全部为**暖黑**投影。纯黑阴影压在米白底上会发灰发脏。
+ */
+$shadow-none: none;
+$shadow-soft: none;
+$shadow-card: none;
+$shadow-glow: none;
+$shadow-float: 0 6rpx 24rpx rgba(23, 19, 14, 0.08);
+$shadow-sheet: 0 -8rpx 36rpx rgba(23, 19, 14, 0.11);
+$shadow-pop: 0 8rpx 24rpx rgba(23, 19, 14, 0.10);
+$shadow-dialog: 0 2rpx 8rpx rgba(23, 19, 14, 0.07), 0 12rpx 32rpx rgba(23, 19, 14, 0.11),
+  0 32rpx 80rpx rgba(23, 19, 14, 0.20);
+
+/* 压印三档（v35 新增）：凹槽的"深度"必须全站一致，否则纸会显得软硬不均 */
+$emboss-1: inset 0 1rpx 2rpx rgba(23, 19, 14, 0.05);
+$emboss-2: inset 0 2rpx 4rpx rgba(23, 19, 14, 0.07), inset 0 -1rpx 0 rgba(255, 255, 255, 0.7);
+$emboss-3: inset 0 3rpx 8rpx rgba(23, 19, 14, 0.09), inset 0 -1rpx 0 rgba(255, 255, 255, 0.75);
+
+/* ============================================================================
+ * 五、墨色面板（深色实体的唯一配方）
+ * ============================================================================
+ * 全站所有"深色实体"（首页 hero / 报告总分卡 / 我的页资料卡 / 回答气泡）
+ * 必须用同一组参数，否则单独看每块都对、放一起就是三种黑。
+ *
+ * 配方：斜向 158° 三段明度渐变（受光面在左上）+ 双内亮边（受光高光）+ 接地投影。
+ * 渐变**必须是暖的**（棕调近黑），冷黑配米白底会读作"脏"。
+ * v35：加深首段（2A251E → 2E2822）让受光面更明显，暗端再压一档。
+ */
+$ink-gradient: linear-gradient(158deg, #2E2822 0%, #1A1611 54%, #0F0C08 100%);
+$ink-edge: inset 0 0 0 1rpx rgba(255, 255, 255, 0.10), inset 0 2rpx 0 rgba(255, 255, 255, 0.14);
+$ink-shadow: 0 16rpx 40rpx rgba(23, 19, 14, 0.28), 0 2rpx 4rpx rgba(23, 19, 14, 0.16);
+/* 墨面上的三级文字（亮底文字在墨底上的对应刻度） */
+$on-ink-1: #FFFFFF;
+$on-ink-2: rgba(255, 255, 255, 0.62);
+$on-ink-3: rgba(255, 255, 255, 0.42);
+$on-ink-line: rgba(255, 255, 255, 0.10);
+
+/* ============================================================================
+ * 六、语义色（低饱和，仅状态用，不作装饰）
+ * ============================================================================ */
+$accent: $ink;                // 强调 = 墨（不是朱砂：朱砂只用于"盖章"语义）
+$accent-deep: #000000;
+$accent-soft: $paper-sunken;
+
+$success: #2C7A58;
+$success-deep: #226047;
+$success-soft: #EEF6F1;
+$warning: #96701F;
+$warning-deep: #7D5A14;
+$warning-soft: #FBF3E6;
+$danger: $verm;
+$danger-deep: $verm-deep;
+$danger-soft: $verm-soft;
+
+/* ============================================================================
+ * 七、旧变量名兼容（全部指向纸本板，禁止另行赋值彩色）
+ * ============================================================================
+ * 这 40 个别名不是"历史垃圾"，是 17 个页面能编译的前提。
+ * 任何新代码都**不要**再引用它们；新代码用上面的一级令牌。
+ */
+$primary-color: $accent;
+$primary: $accent;
+$primary-deep: $accent-deep;
+$primary-light: $accent-soft;
+$aurora-violet: $accent;
+$aurora-indigo: $accent-deep;
+$aurora-azure: $mauve;
+$aurora-cyan: $mauve;
+$aurora-pink: $mauve;
+$mianba-blue: $accent;
+$mianba-blue-light: $accent-deep;
+$mianba-blue-pale: $accent-soft;
+$mianba-blue-dark: $accent-deep;
+$warm-orange: $accent;
+$warm-orange-deep: $accent-deep;
+$warm-orange-soft: $accent-soft;
+$coral-red: $danger;
+$gold: $accent;
+$gold-soft: $accent-soft;
+$cyan: $mauve;
+$cyan-soft: $accent-soft;
+$cream: $accent-soft;
+$peach: $mauve;
+$peach-soft: $accent-soft;
+$pink: $mauve;
+$pink-soft: $accent-soft;
+$blue: $mauve;
+$blue-soft: $accent-soft;
+$mint: $success;
+$mint-soft: $success-soft;
+$yellow: $mauve;
+$yellow-soft: $accent-soft;
+
+/* 渐变历史残留：全部降级为实色（纸本体系禁用彩色渐变） */
+$brand-gradient: $accent;
+$brand-gradient-soft: $accent-soft;
+$primary-gradient: $accent;
+$aurora-glow: none;
+$glow-cyan: none;
+$brand-angle: 158deg;
+
+/* ============================================================================
+ * 八、圆角（v35 比 v34 再收一档：越硬越像印刷品）
+ * ============================================================================
+ * 纸本风拒绝大胶囊。v33 及以前用 48rpx 卡片 + 52rpx 按钮，那是移动端
+ * 通用的"友好"语言（参考 App 的做法）；纸本要的是**印刷品**的克制。
+ */
+$radius-xs: 4rpx;             // 微标记（等级徽章、标签）
+$radius-sm: 10rpx;            // 小标签 / 小图标块
+$radius-md: 16rpx;            // 输入框 / 按钮 / 图标底座
+$radius-lg: 24rpx;            // 卡片 / 列表容器（主刻度）
+$radius-xl: 28rpx;            // 大面板 / 墨色 hero
+$radius-2xl: 36rpx;           // 底部抽屉顶角
+$radius-btn: 16rpx;           // 按钮（★ 方圆，非胶囊）
+$radius-pill: 999rpx;         // chip / 头像 / 开关 / 状态点
+$radius-badge: 4rpx;          // 等级徽章（纸本：接近方形，像盖章）
+$grade-badge-size: 40rpx;     // 等级徽章短边
+
+/* ============================================================================
+ * 九、间距
+ * ============================================================================
+ * 页面左右 48rpx（★ 全站统一，17 个页面已对齐，勿再写 40）。
+ * 区块间距 ≥48rpx：宁可空，不可挤。
+ */
+$sp-1: 8rpx;
+$sp-2: 16rpx;
+$sp-3: 24rpx;
+$sp-4: 32rpx;
+$sp-5: 40rpx;
+$sp-6: 48rpx;
+$sp-7: 64rpx;
+$sp-8: 80rpx;
+$sp-9: 112rpx;
+
+$spacing-xs: $sp-1;
+$spacing-sm: $sp-2;
+$spacing-md: $sp-3;
+$spacing-lg: $sp-4;
+$spacing-xl: $sp-6;
+$spacing-2xl: $sp-7;
+$spacing-3xl: $sp-8;
+$sp-xl: $sp-6;
+
+$page-padding: 48rpx;
+$card-padding: 36rpx;
+
+/* ============================================================================
+ * 十、字号与字重（v35：拉大两极，减少中间档使用频率）
+ * ============================================================================ */
+$font-xs: 20rpx;
+$font-sm: 24rpx;
+$font-md: 28rpx;
+$font-lg: 32rpx;
+$font-xl: 40rpx;
+$font-2xl: 48rpx;
+$font-3xl: 56rpx;
+$font-4xl: 72rpx;
+$font-5xl: 96rpx;
+$font-6xl: 128rpx;            // v35：巨号读数再放大一档（120 → 128）
+$font-7xl: 160rpx;            // v35 新增：仅用于报告总分这种「一个数字占半屏」的场景
+
+$weight-regular: 400;
+$weight-medium: 500;
+$weight-semibold: 600;
+$weight-bold: 700;
+$weight-heavy: 800;
+$weight-black: 900;
+
+/* ============================================================================
+ * 十一、动效
+ * ============================================================================ */
+$motion-fast: 0.16s;
+$motion-base: 0.24s;
+$motion-slow: 0.32s;
+$ease-smooth: cubic-bezier(0.22, 0.61, 0.36, 1);
+$ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+$ease-in: cubic-bezier(0.55, 0.06, 0.68, 0.19);
+$ease-bounce: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+/* 按压反馈：全站唯一参数。页面/组件不得再自写 opacity/scale 数字。 */
+$press-opacity: 0.72;
+$press-scale: 0.975;
+$press-opacity-strong: 0.86;
+$press-scale-strong: 0.986;
+
+/* ============================================================================
+ * 十二、导航栏（设置类页面共用）
+ * ============================================================================ */
+$nav-side-h: 88rpx;
+$nav-back-size: 40rpx;
+$nav-back-gap: 24rpx;
+$nav-title-size: 34rpx;
+$nav-hold-w: 56rpx;
+$nav-gap-bottom: $sp-2;
+$nav-back-tile: 64rpx;
+$nav-fixed-z: 90;
+
+/* ============================================================================
+ * 十三、长文排版
+ * ============================================================================ */
+$reading-line: 1.78;
+$reading-gap: $sp-3;
+$safe-bottom-gap: $sp-9;
+
+/* ============================================================================
+ * 十四、Mixin（唯一配方）
+ * ============================================================================ */
+
+/* 区块标题：字号/字重/字距唯一。跨页切换标题不再跳档。 */
+@mixin sec-heading {
+  font-size: 34rpx;
+  font-weight: $weight-heavy;
+  color: $text-1;
+  letter-spacing: -0.6rpx;
+}
+
+/* 区块序号：朱砂等宽两位（01 / 02）。本设计系统的"盖章"位之一。 */
+@mixin mono-index {
+  font-family: $font-mono;
+  font-size: 22rpx;
+  font-weight: $weight-bold;
+  color: $verm;
+  letter-spacing: 1rpx;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+/* 仪器读数：所有大数字的唯一配方。
+   ★ 等宽 + 收紧字距 + tabular-nums 三件套缺一不可：
+     - 等宽保证数字不跳动（计数动画时尤其明显）
+     - 负字距把小数点两侧收紧，才有"仪表"的密实感 */
+@mixin readout($size: 64rpx) {
+  font-family: $font-mono;
+  font-size: $size;
+  font-weight: $weight-bold;
+  line-height: 1;
+  letter-spacing: -1.5rpx;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 小号仪器标签：等宽全大写（AVERAGE / TOTAL），衬在读数旁边。
+   ⚠️ 中文不适用本 mixin（等宽字体下的中文会挤成一团）。 */
+@mixin mono-label {
+  font-family: $font-mono;
+  font-size: 20rpx;
+  font-weight: $weight-bold;
+  letter-spacing: 2.4rpx;
+  color: $text-3;
+}
+
+/* 发丝线：全站唯一分割线配方 */
+@mixin hairline($side: bottom) {
+  border-#{$side}: 1rpx solid $rule;
+}
+
+/* 长文正文 */
+@mixin reading-body {
+  font-size: $font-md;
+  line-height: $reading-line;
+  color: $text-2;
+}
+
+/* 压印凹槽（v35 新增）：输入框 / 轨道 / 次级填充块的统一配方 */
+@mixin well($radius: $radius-md) {
+  border-radius: $radius;
+  background: $paper-sunken;
+  box-shadow: $emboss-2;
+}
+
+/* 纸上嵌条（v35 新增）：贴着卡片边的一条"被压进去"的窄栏，
+   用于「今日剩余」「提示条」这类附属信息，视觉上像纸边的存根。 */
+@mixin stub {
+  background: $paper-warm;
+  box-shadow: inset 0 1rpx 0 rgba(255, 255, 255, 0.8), $emboss-1;
+  border-radius: $radius-sm;
+}
+
+/* 等级色（v35 新增）：按 grade 字符串取色，供页面用函数式调用。
+   用法：@include grade-color('A') */
+@mixin grade-color($g) {
+  @if $g == 'S' {
+    color: $grade-s;
+  } @else if $g == 'A' {
+    color: $grade-a;
+  } @else if $g == 'B' {
+    color: $grade-b;
+  } @else if $g == 'C' {
+    color: $grade-c;
+  } @else {
+    color: $grade-d;
+  }
+}
+
+/* 等级底色（同上，取浅色版） */
+@mixin grade-soft($g) {
+  @if $g == 'S' {
+    background: $grade-s-soft;
+  } @else if $g == 'A' {
+    background: $grade-a-soft;
+  } @else if $g == 'B' {
+    background: $grade-b-soft;
+  } @else if $g == 'C' {
+    background: $grade-c-soft;
+  } @else {
+    background: $grade-d-soft;
+  }
+}

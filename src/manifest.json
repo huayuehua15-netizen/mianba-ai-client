@@ -1,0 +1,86 @@
+{
+  "name": "我的面试小屋",
+  "appid": "__UNI__MIANBAI",
+  "description": "AI驱动的实时面试模拟小程序",
+  "versionName": "1.0.0",
+  "versionCode": "100",
+  "transformPx": false,
+  "app-plus": {
+    "usingComponents": true,
+    "nvueStyleCompiler": "uni-app",
+    "compilerVersion": 3,
+    "splashscreen": {
+      "alwaysShowBeforeRender": true,
+      "waiting": true,
+      "autoclose": true,
+      "delay": 0
+    },
+    "modules": {},
+    "distribute": {
+      "android": { "permissions": [] },
+      "ios": {},
+      "sdkConfigs": {}
+    }
+  },
+  "quickapp": {},
+  "mp-weixin": {
+    /* 填入你自己的小程序 AppID；留空时微信开发者工具会使用测试号 */
+    "appid": "",
+    "setting": {
+      "urlCheck": false,
+      "es6": true,
+      "minified": true,
+      "postcss": true
+    },
+    "usingComponents": true,
+    "lazyCodeLoading": "requiredComponents",
+    /*
+     * __usePrivacyCheck__：开启微信隐私保护强制校验。
+     * 上线必读（缺一项都可能导致审核被拒或功能被拦截）：
+     *   1) 微信公众平台 → 设置 → 服务内容声明 → 配置《小程序用户隐私保护指引》，
+     *      需声明 4 项权限（与小程序内《隐私政策》及分场景授权弹窗文案保持一致）：
+     *        · 麦克风          —— 录音（语音作答，getRecorderManager）
+     *        · 相机            —— 拍摄头像（chooseImage 的 camera 来源）
+     *        · 选中的照片或视频 —— 更换头像（chooseImage 的 album 来源）
+     *        · 相册（仅写入）   —— 保存成绩海报（saveImageToPhotosAlbum）
+     *      指引未声明的隐私接口在正式/体验版会被直接拦截（保存海报报 privacy 错误的排查起点）。
+     *   2) 公众平台 → 开发管理 → 开发设置 → 服务器域名 → request 合法域名，加入 api/request.js 中的生产域名。
+     *   3) 语音输入为「原生录音 + 服务端百炼 ASR」，不再依赖微信同声传译插件，无需开通插件。
+     */
+    "__usePrivacyCheck__": true,
+    "requiredPrivateInfos": [],
+    /* v31 补 networkTimeout：
+       此前 mp-weixin 段未声明，downloadFile / uploadFile / connectSocket
+       走微信默认值（各 60s）。本项目 request 类接口都由 api/request.js
+       逐个指定了 timeout（普通 15s / AI 流 60s / ASR 30s），不受影响；
+       但海报保存/上传这类走 downloadFile 的路径缺兜底，
+       网络差时会长时间无反馈。connectSocket 设 10s 便于快速失败。 */
+    "networkTimeout": {
+      "request": 15000,
+      "connectSocket": 10000,
+      "uploadFile": 30000,
+      "downloadFile": 30000
+    }
+    /* ⚠️ renderer 刻意不设 skyline（2026-10 决策，勿当漏洞"优化"）：
+       1) echart.vue 已因 canvas 2d 同层渲染在用户机型退化、改成 SVG 自绘，
+          Skyline 下布局与定位模型不同，需整体返工；
+       2) pages/interview/index.vue 刚把根容器从 position:fixed 迁回
+          100vh 正常流（fixed 不跟随页面转场动画），Skyline 会推翻该修复；
+       3) 要求基础库 ≥2.30，App.vue onLaunch 的登录自愈时序需重新验证。
+       上线前不动；后续以「长列表滚动实测掉帧数据」为再评估依据。 */
+    /* ⚠️ darkmode 刻意不开：本项目是纯白单色体系（uni.scss $bg-page:#FFFFFF），
+       开暗色会让整套描边/填充层次失效，需要单独设计一套暗色板。
+       这是设计决策，不是遗漏。 */
+    /* 权限说明：app.json 的 permission 字段仅接受 scope.userLocation 等位置类授权，
+     * 写 scope.record 会报「无效的 app.json permission」。录音授权由运行时
+     * wx.authorize({ scope: "scope.record" }) 在首次使用录音时弹出（getRecorderManager 前置调用），
+     * 无需也不能在此声明。若未来升级企业主体，取消下述注释即可恢复插件方案：
+     * "plugins": { "WechatSI": { "version": "0.3.5", "provider": "wx069ba97219f66d99" } }
+     */
+  },
+  "h5": {
+    "title": "我的面试小屋",
+    "router": { "mode": "hash" }
+  },
+  "vueVersion": "3"
+}
