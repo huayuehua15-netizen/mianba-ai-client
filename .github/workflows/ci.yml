@@ -25,6 +25,9 @@ jobs:
       - name: Syntax check
         run: node scripts/checkSyntax.js
 
+      - name: Unit tests
+        run: npm test
+
       - name: Build mini program
         env:
           VITE_API_BASE_URL: https://example.com/api/v1

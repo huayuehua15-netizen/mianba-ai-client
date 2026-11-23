@@ -208,6 +208,7 @@ src/
 ├── pages.json
 └── uni.scss        # 设计令牌与六条铁律
 scripts/            # 语法校验、tabBar 图标生成、构建后自愈
+tests/              # Vitest：等级映射、格式化、图表配置
 docs/               # 架构说明与界面截图
 ```
 
@@ -275,11 +276,12 @@ H5 下的登录走本地模拟态，仅用于界面预览；业务数据仍需�
 | `npm run dev:mp-weixin` | 微信小程序开发构建 |
 | `npm run build:mp-weixin` | 生产构建，并自动补拷静态资源 |
 | `npm run dev:h5` / `build:h5` | H5 预览与构建 |
+| `npm test` | Vitest 单元测试：等级边界、日期/时长格式化、图表配置 |
 | `node scripts/checkSyntax.js` | 不依赖构建，对全部 JS 和 `.vue` 的 `<script>` 做语法校验 |
 
 `postbuild:mp-weixin` 会重新同步 `src/static` 到产物并刷新 mtime。微信开发者工具占用文件时，uni-app 自带的 static 拷贝可能静默失败，这一步用来兜底。
 
-CI 见 [.github/workflows/ci.yml](.github/workflows/ci.yml)：Node 20 上安装依赖、语法校验、生产构建。
+CI 见 [.github/workflows/ci.yml](.github/workflows/ci.yml)：Node 20 上安装依赖、语法校验、单元测试、生产构建。
 
 ## 已知约束与设计取舍
 
