@@ -305,7 +305,7 @@ H5 下的登录走本地模拟态，仅用于界面预览；业务数据仍需�
 
 `postbuild:mp-weixin` 会重新同步 `src/static` 到产物并刷新 mtime。微信开发者工具占用文件时，uni-app 自带的 static 拷贝可能静默失败，这一步用来兜底。
 
-CI 见 [.github/workflows/ci.yml](.github/workflows/ci.yml)：Node 20 上安装依赖、语法校验、单元测试、生产构建。
+CI 见 [.github/workflows/ci.yml](.github/workflows/ci.yml)：Node 20 上安装依赖、语法校验、单元测试，并同时构建微信小程序与 H5。
 
 ## 已知约束与设计取舍
 
