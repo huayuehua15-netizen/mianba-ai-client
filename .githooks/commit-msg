@@ -1,0 +1,4 @@
+#!/bin/sh
+# 把英文 Conventional Commits 头自动改写成中文【类型】头。
+# 启用：git config core.hooksPath .githooks
+node "$(git rev-parse --show-toplevel)/scripts/commit-msg.js" "$1" || true
